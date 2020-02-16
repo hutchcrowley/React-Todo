@@ -1,79 +1,83 @@
-import React from 'react';
+import React from 'react'
 
-import { todo } from './components/data';
-
-import TodoForm from './components/TodoComponents/TodoForm';
-import TodoList from './components/TodoComponents/TodoList';
-
-import './styles.css';
+import SearchForm from './components/SearchForm'
+import TodoForm from './components/TodoForm'
+import TodoList from './components/TodoList'
 
 // you will need a place to store your state in this component.
 // design `App` to be the parent component of your application.
 // this component is going to take care of state, and any change handlers you need to work with your state
 
 class App extends React.Component {
-  constructor() {
-    super();
+  constructor () {
+    super()
     this.state = {
-      todo: todo,
-      task: '',
-      id: 0,
-      completed: false
-    };
-    console.log('this is state', todo);
+      todoList: []
+    }
+    console.log(this.state)
   }
 
-  toggleItem = itemId => {
-    console.log(itemId);
-
+  toggleItem = itemid => {
     this.setState({
-      todo: this.state.todo.map(item => {
-        if (itemId === item.id) {
+      todoList: this.state.todoList.map(item => {
+        if (item.id === itemid) {
           return {
             ...item,
             completed: !item.completed
-          };
+          }
         }
-        return item;
+        return item
       })
-    });
-  };
+    })
+  }
 
-  clearCompleted = item => {
+  addItem = listItem => {
+    console.log('listItem in the addItem function: ', listItem)
     this.setState({
-      todo: this.state.todo.filter(item => {
-        if (item.completed === false) {
-          return {
-            ...item,
-            completed: !item.completed
-          };
+      todoList: [
+        ...this.state.todoList,
+        {
+          task: listItem,
+          id: Date.now(),
+          completed: false
         }
-      })
-    });
-  };
+      ]
+    })
+  }
 
-  addItem = itemText => {
-    const newItem = {
-      task: itemText,
-      completed: false,
-      id: Date.now()
-    };
-
+  clearCompleted = () => {
     this.setState({
-      todo: [...this.state.todo, newItem]
-    });
-  };
+      todoList: this.state.todoList.filter(item => !item.completed)
+    })
+  }
 
-  render() {
+  searchResultDisplay = search => {
+    console.log(search)
+    let searchResults = this.state.todoList.filter(
+      item => item.task.toLowerCase() === search.toLowerCase()
+    )
+    this.setState({
+      todoList: searchResults
+    })
+  }
+
+  render () {
     return (
       <div className='App'>
-        <div className='header'>
-          <h1>Hutch's TODO List:</h1>
-          <TodoForm addItem={this.addItem} />
+        <h1>Hutch's TODO List:</h1>
+        <div className='todo-wrapper'>
+          <TodoForm
+            task={this.state.todoList.task}
+            addItem={this.addItem}
+            clearCompleted={this.clearCompleted}
+          />
         </div>
-        <TodoList todo={this.state.todo} toggleItem={this.toggleItem} clearCompleted={this.clearCompleted} />
+        <TodoList todoList={this.state.todoList} toggleItem={this.toggleItem} />
+        <div className='search'>
+          <SearchForm search={this.searchResultDisplay} />
+        </div>
       </div>
-    );
+    )
   }
 }
-export default App;
+export default App
